@@ -16,7 +16,11 @@ builder.Services.AddMassTransit(conf =>
     conf.AddConsumer<StockReservedEventConsumer>();
     conf.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(Environment.GetEnvironmentVariable("RabbitMq"));
+        cfg.Host("host.docker.internal", (auth) =>
+        {
+            auth.Username("guest");
+            auth.Password("guest");
+        });
         cfg.ReceiveEndpoint(RabbitMQConstant.StockReservedQueueName, x =>
         {
             x.ConfigureConsumer<StockReservedEventConsumer>(context);
@@ -26,12 +30,8 @@ builder.Services.AddMassTransit(conf =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

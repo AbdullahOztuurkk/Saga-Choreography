@@ -9,6 +9,13 @@ namespace Web.API.Configurations;
 
 public class StockModule : Module
 {
+    private readonly IConfiguration _configuration;
+
+    public StockModule(IConfiguration configuration)
+    {
+        this._configuration = configuration;
+    }
+
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterAssemblyTypes(typeof(MainApiController).Assembly).Where(t => t.IsSubclassOf(typeof(MainApiController))).PropertiesAutowired();
@@ -19,6 +26,6 @@ public class StockModule : Module
             .PropertiesAutowired()
             .InstancePerLifetimeScope();
 
-        builder.AddUnitOfWorkContext<StockDbContext>(EnvironmentVariableProvider.DbConnectionString);
+        builder.AddUnitOfWorkContext<StockDbContext>(_configuration.GetConnectionString("SqlConnection"));
     }
 }

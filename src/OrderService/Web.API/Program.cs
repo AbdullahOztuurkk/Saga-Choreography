@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => containerBuilder.RegisterModule(new CoreModule(builder.Configuration)));
-builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => containerBuilder.RegisterModule(new OrderModule()));
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => containerBuilder.RegisterModule(new OrderModule(builder.Configuration)));
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -28,7 +28,11 @@ builder.Services.AddMassTransit(conf =>
 
     conf.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(Environment.GetEnvironmentVariable("RabbitMq"));
+        cfg.Host("host.docker.internal", (auth) =>
+        {
+            auth.Username("guest");
+            auth.Password("guest");
+        });
         cfg.ReceiveEndpoint(RabbitMQConstant.StockNotReservedQueueName, x =>
         {
             x.ConfigureConsumer<StockNotReservedConsumer>(context);
@@ -53,12 +57,8 @@ if (context.Database.GetPendingMigrations().Any())
     await context.Database.MigrateAsync();
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

@@ -1,5 +1,4 @@
-﻿using CoreLib.Constant;
-using CoreLib.DataAccess.Concrete;
+﻿using CoreLib.DataAccess.Concrete;
 using Domain.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -15,10 +14,11 @@ public class StockDbContext : DbContextBase
 
 public class StockDbContextDesignTimeFactory : IDesignTimeDbContextFactory<StockDbContext>
 {
+    string connectionString = "Data Source=c_sqlserver;Initial Catalog=SagaStockDb;Persist Security Info=True;User ID=sa;Password=Test123!_";
     public StockDbContext CreateDbContext(string[] args)
     {
         var builder = new DbContextOptionsBuilder<StockDbContext>();
-        builder.UseSqlServer(EnvironmentVariableProvider.DbConnectionString);
+        builder.UseSqlServer(connectionString);
         return new StockDbContext(builder.Options);
     }
 }

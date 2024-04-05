@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => containerBuilder.RegisterModule(new CoreModule(builder.Configuration)));
-builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => containerBuilder.RegisterModule(new StockModule()));
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => containerBuilder.RegisterModule(new StockModule(builder.Configuration)));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -27,7 +27,11 @@ builder.Services.AddMassTransit(conf =>
     conf.AddConsumer<PaymentFailedEventConsumer>();
     conf.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(Environment.GetEnvironmentVariable("RabbitMq"));
+        cfg.Host("host.docker.internal", (auth) =>
+        {
+            auth.Username("guest");
+            auth.Password("guest");
+        });
         cfg.ReceiveEndpoint(RabbitMQConstant.StockOrderCreatedQueueName, x =>
         {
             x.ConfigureConsumer<OrderCreatedEventConsumer>(context);
@@ -58,12 +62,8 @@ if (!context.Stocks.Any())
     await context.SaveChangesAsync();
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

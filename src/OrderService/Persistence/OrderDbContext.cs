@@ -1,5 +1,4 @@
-﻿using CoreLib.Constant;
-using CoreLib.DataAccess.Concrete;
+﻿using CoreLib.DataAccess.Concrete;
 using Domain.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -18,10 +17,11 @@ public class OrderDbContext : DbContextBase
 
 public class OrderDbContextDesignTimeFactory : IDesignTimeDbContextFactory<OrderDbContext>
 {
+    string connectionString = "Data Source=c_sqlserver;Initial Catalog=SagaOrderDb;Persist Security Info=True;User ID=sa;Password=Test123!_";
     public OrderDbContext CreateDbContext(string[] args)
     {
         var builder = new DbContextOptionsBuilder<OrderDbContext>();
-        builder.UseSqlServer(EnvironmentVariableProvider.DbConnectionString);
+        builder.UseSqlServer(connectionString);
         return new OrderDbContext(builder.Options);
     }
 }
