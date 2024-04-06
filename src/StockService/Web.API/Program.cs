@@ -1,4 +1,4 @@
-using Application.Consumers;
+﻿using Application.Consumers;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CoreLib.Configurations;
@@ -6,6 +6,7 @@ using Domain.Concrete;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using RabbitMQ.Client;
 using SharedLib;
 using Web.API.Configurations;
 
@@ -27,7 +28,7 @@ builder.Services.AddMassTransit(conf =>
     conf.AddConsumer<PaymentFailedEventConsumer>();
     conf.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("host.docker.internal", (auth) =>
+        cfg.Host("s_rabbitmq", (auth) =>
         {
             auth.Username("guest");
             auth.Password("guest");
