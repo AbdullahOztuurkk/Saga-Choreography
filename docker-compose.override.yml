@@ -9,7 +9,7 @@ services:
         - "7001:443"
         networks:
         - net_backend
-        restart: always
+        restart: no
         depends_on:
         - s_sqlserver
         - s_rabbitmq
@@ -25,7 +25,7 @@ services:
         - "7005:443"
         networks:
         - net_backend
-        restart: always
+        restart: no
         depends_on:
         - s_sqlserver
         - s_rabbitmq
@@ -43,7 +43,7 @@ services:
         - s_rabbitmq
         networks:
         - net_backend
-        restart: always
+        restart: no
         mem_limit: 1g
         external_links:
         - s_rabbitmq
@@ -51,8 +51,8 @@ services:
     s_sqlserver:
         user: root
         environment:
-        - ACCEPT_EULA=Y
-        - MSSQL_SA_PASSWORD=Test123!_
+            ACCEPT_EULA: Y
+            MSSQL_SA_PASSWORD: Test123!_
         ports:
         - "1433:1433"
         volumes:
@@ -70,11 +70,15 @@ services:
         - rabbitmq:/var/lib/rabbitmq
         networks:
         - net_backend
+        restart: on-failure
+        environment:
+            RABBITMQ_HOST: localhost
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
 
 networks:
     net_backend:
         driver: bridge
-        #external: true
 
 volumes:
     rabbitmq:
